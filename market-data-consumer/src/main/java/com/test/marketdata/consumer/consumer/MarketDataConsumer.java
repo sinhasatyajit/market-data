@@ -1,5 +1,6 @@
 package com.test.marketdata.consumer.consumer;
 
+import com.test.marketdata.consumer.sseemitter.SseEmitterHelper;
 import com.test.marketdata.model.MarketData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,12 +28,18 @@ public class MarketDataConsumer {
     public void getPublishedData(MarketData marketData){
         LOGGER.info(marketData.toString());
         marketDataMap.put(marketData.getRicCode(),marketData);
+        SseEmitterHelper.dispatch(processData());
     }
 
     public Map<String, BigDecimal> getPrice(){
+        return processData();
+    }
+
+    private Map<String,BigDecimal> processData(){
         TreeMap<String, BigDecimal> sortedPriceMap = marketDataMap.values()
-                        .parallelStream()
-                        .collect(Collectors.toMap(data -> data.getRicCode(), data -> data.getPrice(),(o1, o2) -> o1, TreeMap::new));
+                .parallelStream()
+                .collect(Collectors.toMap(data -> data.getRicCode(), data -> data.getPrice(),(o1, o2) -> o1, TreeMap::new));
+        SseEmitterHelper.dispatch(Collections.unmodifiableSortedMap(sortedPriceMap));
         return Collections.unmodifiableSortedMap(sortedPriceMap);
     }
 }

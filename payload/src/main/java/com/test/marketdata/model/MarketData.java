@@ -3,6 +3,8 @@ package com.test.marketdata.model;
 import com.test.marketdata.utility.Utility;
 import lombok.*;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -38,7 +40,4 @@ public class MarketData {
                         new MarketData(ricCode,Utility.getRandomPrice(2),LocalDateTime.now()))
                 .collect(Collectors.toMap(data -> data.getRicCode(), Function.identity()));
     }
-
-
-
 }
